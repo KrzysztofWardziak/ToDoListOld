@@ -1,0 +1,60 @@
+﻿@model IEnumerable<ToDoListOld.Models.ToDo>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Zadania</h1>
+
+<p>
+    <a asp-action="AddTask">Dodaj nowe</a>
+</p>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>
+            Numer
+        </th>
+        <th>
+            Tytuł
+        </th>
+        <th>
+            Opis
+        </th>
+        <th>
+            Data utworzenia
+        </th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @* TODO in future ToDo/ToggleIsDone !!! *@
+                <input type="checkbox" checked="@item.IsDone" @* onclick="window.location.href ='/ToDO/ToggleIsDone/@item.Id';"  *@/>
+                <a href="/ToDo/Details/@item.Id">
+                    @item.Title
+                </a>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedDate)
+            </td>
+            <td class="text-center">
+                <a href="/ToDo/EditTask/@item.Id" class="btn btn-sm btn-success">Edycja</a>
+            </td>
+            <td class="text-center">
+                <a href="/ToDo/Delete/@item.Id" onclick="return confirm('Are you sure?');" class="btn btn-sm btn-danger">Usuń</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
