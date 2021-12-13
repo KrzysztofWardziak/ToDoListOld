@@ -15,5 +15,9 @@ namespace ToDoListOld.Models
         {
 
         }
+
+        public Context()
+        {
+        }
     }
 }

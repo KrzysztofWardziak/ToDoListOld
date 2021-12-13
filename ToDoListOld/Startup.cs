@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ToDoListOld.Models;
+using ToDoListOld.Repositories;
 
 namespace ToDoListOld
 {
@@ -26,7 +27,7 @@ namespace ToDoListOld
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-
+            services.AddTransient<IToDoRepository, ToDoRepository>();
             services.AddDbContext<Context>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllersWithViews();
@@ -49,7 +50,6 @@ namespace ToDoListOld
             app.UseStaticFiles();
 
             app.UseRouting();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

@@ -4,21 +4,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ToDoListOld.Models;
+using ToDoListOld.Repositories;
 
 namespace ToDoListOld.Controllers
 {
     public class ToDoController : Controller
     {
-        private readonly Context _context;
+        private readonly IToDoRepository _toDoRepository;
 
-        public ToDoController(Context context)
+        public ToDoController(IToDoRepository toDoRepository)
         {
-            _context = context;
+            _toDoRepository = toDoRepository;
         }
 
         public IActionResult Index()
         {
-            var toDoes = _context.ToDoLists;
+            var toDoes = _toDoRepository.GetAllTasks();
             return View(toDoes);
         }
 
@@ -31,9 +32,11 @@ namespace ToDoListOld.Controllers
         [HttpPost]
         public IActionResult AddTask(ToDo model)
         {
-            model.CreatedDate = DateTime.Now.ToString("D");
-            _context.ToDoLists.Add(model);
-            _context.SaveChanges();
+            if (ModelState.IsValid)
+            {
+                model.CreatedDate = DateTime.Now.ToString("D");
+                _toDoRepository.AddTask(model);
+            }
 
             return RedirectToAction("Index");
         }
@@ -41,43 +44,31 @@ namespace ToDoListOld.Controllers
         [HttpGet]
         public IActionResult EditTask(int id)
         {
-            var task = _context.ToDoLists.FirstOrDefault(x => x.Id == id);
-            if (task == null)
-                throw new Exception("Zadanie nie istnieje!");
-
+            var task = _toDoRepository.GetTask(id);
             return View(task);
         }
 
         [HttpPost]
         public IActionResult EditTask(ToDo todo)
         {
-            _context.Attach(todo);
-            _context.Entry(todo).Property("Title").IsModified = true;
-            _context.Entry(todo).Property("Description").IsModified = true;
-            _context.Entry(todo).Property("IsDone").IsModified = true;
-            _context.Entry(todo).Property("ModifiedDate").IsModified = true;
-            _context.SaveChanges();
-            return RedirectToAction("Index");
+            if (ModelState.IsValid)
+            {
+                _toDoRepository.UpdateTask(todo);
+                return RedirectToAction("Index");
+            }
+
+            return View(todo);
         }
 
         public IActionResult Details(int id)
         {
-            var task = _context.ToDoLists.FirstOrDefault(x => x.Id == id);
-            if (task == null)
-                throw new Exception("Zadanie nie istnieje!");
-
+            var task = _toDoRepository.GetTask(id);
             return View(task);
         }
 
         public IActionResult Delete(int id)
         {
-            var task = _context.ToDoLists.FirstOrDefault(x => x.Id == id);
-            if (task == null)
-                throw new Exception("Zadanie nie istnieje!");
-
-            _context.ToDoLists.Remove(task);
-            _context.SaveChanges();
-
+            _toDoRepository.DeleteTask(id);
             return RedirectToAction("Index");
         }
     }
